@@ -45,7 +45,7 @@ float alien1X      = -55.0f; // alien 1 position
 float alien2X      =  55.0f; // alien 2 position
 float alienBobY    = 0.0f;   // aliens bobbing up/down
 float marsPhaseTimer = 0.0f;
-float escapeRocketY = -50.0f;
+float escapeRocketY = -45.0f;
 float warningAlpha = 0.0f;
 
 bool isWakeUpScene = false;
@@ -155,32 +155,61 @@ void drawRocketAt(float cx, float cy, float flicker)
 {
     glPushMatrix();
     glTranslatef(cx, cy, 0);
+    glScalef(1.7f, 1.7f, 1.0f); // Rebalanced cinematic scale
 
-    // Body
-    drawRect(-5, 0, 10, 25, 0.9f, 0.9f, 0.9f);
-    // Nose
-    glColor3f(1.0f, 0.0f, 0.0f);
+    // Rocket Body (taller and slightly wider)
+    drawRect(-8, 0, 16, 45, 0.85f, 0.85f, 0.88f);
+    drawRect(-4, 0, 8, 45, 0.95f, 0.95f, 0.95f); // Highlight
+
+    // Nose Cone
+    glColor3f(0.8f, 0.1f, 0.1f);
     glBegin(GL_TRIANGLES);
-        glVertex2f(-5, 25); glVertex2f(5, 25); glVertex2f(0, 35);
+        glVertex2f(-8, 45); glVertex2f(8, 45); glVertex2f(0, 60);
     glEnd();
+    glColor3f(1.0f, 0.2f, 0.2f);
+    glBegin(GL_TRIANGLES);
+        glVertex2f(-4, 45); glVertex2f(4, 45); glVertex2f(0, 58);
+    glEnd();
+
     // Fins
+    glColor3f(0.7f, 0.1f, 0.1f);
     glBegin(GL_TRIANGLES);
-        glVertex2f(-5, 0); glVertex2f(-12, 0); glVertex2f(-5, 8);
-        glVertex2f( 5, 0); glVertex2f( 12, 0); glVertex2f( 5, 8);
+        glVertex2f(-8, 5); glVertex2f(-18, -5); glVertex2f(-8, 15);
+        glVertex2f( 8, 5); glVertex2f( 18, -5); glVertex2f( 8, 15);
     glEnd();
-    // Window
-    drawCircle(0, 15, 3, 20, 0.1f, 0.2f, 0.5f);
-    // Smooth engine flame. Pass 0.0f when the rocket is powered down.
+    
+    // Landing Gear/Struts
+    glColor3f(0.4f, 0.4f, 0.45f);
+    glLineWidth(2.0f);
+    glBegin(GL_LINES);
+        glVertex2f(-8, 8); glVertex2f(-14, -4);
+        glVertex2f( 8, 8); glVertex2f( 14, -4);
+    glEnd();
+
+    // Windows
+    drawCircle(0, 32, 4.5f, 20, 0.4f, 0.4f, 0.45f); // Rim
+    drawCircle(0, 32, 3.5f, 20, 0.1f, 0.2f, 0.5f);  // Glass
+    drawCircle(-1, 33, 1.0f, 10, 0.6f, 0.8f, 1.0f); // Reflection
+    
+    drawCircle(0, 18, 4.5f, 20, 0.4f, 0.4f, 0.45f); // Rim
+    drawCircle(0, 18, 3.5f, 20, 0.1f, 0.2f, 0.5f);  // Glass
+    drawCircle(-1, 19, 1.0f, 10, 0.6f, 0.8f, 1.0f); // Reflection
+
+    // Body details
+    drawRect(-8, 25, 16, 2, 0.7f, 0.1f, 0.1f);
+    drawRect(-8, 11, 16, 2, 0.7f, 0.1f, 0.1f);
+
+    // Smooth engine flame
     if (flicker > 0.0f)
     {
         float flame = 0.65f + flicker * 0.55f;
         glColor3f(1.0f, 0.35f + flicker * 0.35f, 0.0f);
         glBegin(GL_TRIANGLES);
-            glVertex2f(-4, 0); glVertex2f(4, 0); glVertex2f(0, -12.0f * flame);
+            glVertex2f(-6, 0); glVertex2f(6, 0); glVertex2f(0, -18.0f * flame);
         glEnd();
         glColor3f(1.0f, 0.90f, 0.20f);
         glBegin(GL_TRIANGLES);
-            glVertex2f(-3, 0); glVertex2f(3, 0); glVertex2f(0, -7.5f * flame);
+            glVertex2f(-3, 0); glVertex2f(3, 0); glVertex2f(0, -10.0f * flame);
         glEnd();
     }
     glPopMatrix();
@@ -195,119 +224,115 @@ void drawGirlStanding(float cx, float cy)
 {
     glPushMatrix();
     glTranslatef(cx, cy, 0);
+    glScalef(0.65f, 0.65f, 1.0f); // Reduce size slightly as requested to let rocket dominate
 
-    // ── BOOTS ────────────────────────────────────────────────
-    // Thick white space boots with dark sole
-    drawRect(-9,  -5, 9, 6, 0.85f, 0.85f, 0.88f);  // left boot
-    drawRect( 1,  -5, 9, 6, 0.85f, 0.85f, 0.88f);  // right boot
-    drawRect(-10, -6, 10, 2, 0.25f, 0.25f, 0.28f); // left sole
-    drawRect(  1, -6, 10, 2, 0.25f, 0.25f, 0.28f); // right sole
-    // Boot ankle ring
-    drawRect(-9,  1, 9, 2, 0.65f, 0.65f, 0.70f);
-    drawRect( 1,  1, 9, 2, 0.65f, 0.65f, 0.70f);
-
-    // ── LEGS ─────────────────────────────────────────────────
-    // White pressurized suit legs
-    drawRect(-8,  2, 7, 18, 0.90f, 0.90f, 0.93f);  // left leg
-    drawRect( 1,  2, 7, 18, 0.90f, 0.90f, 0.93f);  // right leg
-    // Knee joint rings
-    drawRect(-9, 10, 9, 3, 0.65f, 0.65f, 0.70f);   // left knee
-    drawRect( 0, 10, 9, 3, 0.65f, 0.65f, 0.70f);   // right knee
+    // Animation cycle based on marsTimer
+    float walkCycle = sinf(marsTimer * 18.0f);
+    if (marsPhase > 1 && marsPhase < 5) walkCycle = 0.0f;
 
     // ── BACKPACK / PLSS ───────────────────────────────────────
-    drawRect(-10, 20, 20, 18, 0.55f, 0.55f, 0.60f);
-    // PLSS straps
-    glColor3f(0.40f, 0.40f, 0.45f);
-    glLineWidth(1.5f);
-    glBegin(GL_LINES);
-        glVertex2f(-10, 26); glVertex2f(10, 26);
-        glVertex2f(-10, 30); glVertex2f(10, 30);
-    glEnd();
-    // PLSS vents
-    drawRect(-8, 20, 3, 2, 0.30f, 0.30f, 0.35f);
-    drawRect(-3, 20, 3, 2, 0.30f, 0.30f, 0.35f);
-    drawRect( 3, 20, 3, 2, 0.30f, 0.30f, 0.35f);
+    drawRect(-11, 20, 22, 18, 0.55f, 0.55f, 0.60f); // backpack body
+    drawRect(-12, 22, 2, 14, 0.45f, 0.45f, 0.50f); // side detail
+    drawRect( 10, 22, 2, 14, 0.45f, 0.45f, 0.50f); // side detail
+
+    // ── RIGHT ARM (Background) ────────────────────────────────
+    glPushMatrix();
+    glTranslatef(7.0f, 35.0f, 0.0f); // shoulder hinge
+    glRotatef(walkCycle * 20.0f - 10.0f, 0, 0, 1);
+    // Upper arm
+    drawRect(-3.0f, -10.0f, 6.0f, 10.0f, 0.85f, 0.85f, 0.88f);
+    // Elbow
+    drawRect(-3.5f, -12.0f, 7.0f, 3.0f, 0.65f, 0.65f, 0.70f);
+    // Forearm
+    drawRect(-2.5f, -18.0f, 5.0f, 6.0f, 0.85f, 0.85f, 0.88f);
+    // Wrist ring
+    drawRect(-3.0f, -19.0f, 6.0f, 2.0f, 0.5f, 0.5f, 0.55f);
+    // Glove/Hand (Clearly visible ball with thumb hint)
+    drawCircle(0.0f, -21.0f, 3.5f, 16, 0.4f, 0.4f, 0.45f);
+    drawCircle(-2.5f, -20.0f, 1.5f, 10, 0.4f, 0.4f, 0.45f); // thumb
+    glPopMatrix();
+
+    // ── RIGHT LEG (Background) ─────────────────────────────────
+    glPushMatrix();
+    glTranslatef(4.0f, 20.0f, 0.0f); // hinge at hip
+    glRotatef(-walkCycle * 15.0f, 0, 0, 1);
+    drawRect(-3.5f, -18.0f, 7.0f, 18.0f, 0.85f, 0.85f, 0.88f); 
+    drawRect(-4.5f, -10.0f, 9.0f, 3.0f, 0.65f, 0.65f, 0.70f);
+    drawRect(-4.5f, -24.0f, 9.0f, 6.0f, 0.75f, 0.75f, 0.80f);
+    drawRect(-5.5f, -25.0f, 11.0f, 2.0f, 0.3f, 0.3f, 0.35f); // sole
+    glPopMatrix();
+
+    // ── LEFT LEG (Foreground) ─────────────────────────────────
+    glPushMatrix();
+    glTranslatef(-4.0f, 20.0f, 0.0f); // hinge at hip
+    glRotatef(walkCycle * 15.0f, 0, 0, 1);
+    drawRect(-3.5f, -18.0f, 7.0f, 18.0f, 0.90f, 0.90f, 0.93f); 
+    drawRect(-4.5f, -10.0f, 9.0f, 3.0f, 0.70f, 0.70f, 0.75f);
+    drawRect(-4.5f, -24.0f, 9.0f, 6.0f, 0.80f, 0.80f, 0.85f);
+    drawRect(-5.5f, -25.0f, 11.0f, 2.0f, 0.25f, 0.25f, 0.28f); // sole
+    glPopMatrix();
 
     // ── TORSO ─────────────────────────────────────────────────
-    // Main white suit body on top of backpack
     drawRect(-9, 20, 18, 18, 0.92f, 0.92f, 0.95f);
+    drawRect(-9, 20, 3, 18, 0.85f, 0.85f, 0.88f); // Shading
+    
+    // Belt
+    drawRect(-10, 18, 20, 3, 0.6f, 0.6f, 0.65f);
+    drawRect(-3, 17, 6, 5, 0.7f, 0.7f, 0.75f); // buckle
 
     // ── CHEST PANEL ───────────────────────────────────────────
-    drawRect(-5, 24, 10, 7, 0.70f, 0.72f, 0.75f);
+    drawRect(-5, 24, 10, 9, 0.70f, 0.72f, 0.75f);
     glColor3f(0.40f, 0.40f, 0.45f);
-    glLineWidth(1.0f);
+    glLineWidth(1.5f);
     glBegin(GL_LINE_LOOP);
         glVertex2f(-5, 24); glVertex2f(5, 24);
-        glVertex2f( 5, 31); glVertex2f(-5, 31);
+        glVertex2f( 5, 33); glVertex2f(-5, 33);
     glEnd();
-    // Chest buttons
-    drawCircle(-3, 29, 1.0f, 8, 1.0f, 0.2f, 0.2f); // red
-    drawCircle( 0, 29, 1.0f, 8, 0.2f, 1.0f, 0.2f); // green
-    drawCircle( 3, 29, 1.0f, 8, 0.2f, 0.6f, 1.0f); // blue
-    // Chest screen
-    drawRect(-4, 24, 8, 3, 0.10f, 0.30f, 0.50f);
+    drawCircle(-2.5f, 30.5f, 1.2f, 10, 1.0f, 0.2f, 0.2f); // red
+    drawCircle( 0.0f, 30.5f, 1.2f, 10, 0.2f, 1.0f, 0.2f); // green
+    drawCircle( 2.5f, 30.5f, 1.2f, 10, 0.2f, 0.6f, 1.0f); // blue
+    drawRect(-3.5f, 25.5f, 7.0f, 3.5f, 0.1f, 0.8f, 0.9f); // bright cyan screen
 
-    // ── OXYGEN TUBES ──────────────────────────────────────────
-    glColor3f(0.70f, 0.70f, 0.75f);
-    glLineWidth(2.5f);
-    glBegin(GL_LINE_STRIP);
-        glVertex2f(-9, 32); glVertex2f(-12, 30);
-        glVertex2f(-12, 25); glVertex2f(-10, 23);
-    glEnd();
-    glBegin(GL_LINE_STRIP);
-        glVertex2f( 9, 32); glVertex2f( 12, 30);
-        glVertex2f( 12, 25); glVertex2f( 10, 23);
-    glEnd();
+    // ── LEFT ARM (Foreground) ─────────────────────────────────
+    glPushMatrix();
+    glTranslatef(-7.0f, 35.0f, 0.0f); // shoulder hinge
+    glRotatef(-walkCycle * 20.0f + 10.0f, 0, 0, 1);
+    drawCircle(0.0f, 0.0f, 4.0f, 15, 0.9f, 0.9f, 0.93f); // Shoulder joint
+    drawCircle(0.0f, 0.0f, 2.5f, 10, 0.7f, 0.7f, 0.75f);
+    drawRect(-3.0f, -10.0f, 6.0f, 10.0f, 0.90f, 0.90f, 0.93f);
+    drawRect(-3.5f, -12.0f, 7.0f, 3.0f, 0.70f, 0.70f, 0.75f);
+    drawRect(-2.5f, -18.0f, 5.0f, 6.0f, 0.90f, 0.90f, 0.93f);
+    drawRect(-3.0f, -19.0f, 6.0f, 2.0f, 0.55f, 0.55f, 0.60f); // Wrist ring
+    // Glove/Hand (Clearly visible ball with thumb hint)
+    drawCircle(0.0f, -21.0f, 3.5f, 16, 0.45f, 0.45f, 0.50f);
+    drawCircle(2.5f, -20.0f, 1.5f, 10, 0.45f, 0.45f, 0.50f); // thumb
+    glPopMatrix();
 
     // ── NECK RING ─────────────────────────────────────────────
-    drawRect(-6, 37, 12, 4, 0.65f, 0.65f, 0.70f);
-    // Neck ring bolts
-    drawCircle(-4, 39, 0.8f, 8, 0.40f, 0.40f, 0.45f);
-    drawCircle( 0, 39, 0.8f, 8, 0.40f, 0.40f, 0.45f);
-    drawCircle( 4, 39, 0.8f, 8, 0.40f, 0.40f, 0.45f);
-
-    // ── LEFT ARM ──────────────────────────────────────────────
-    drawRect(-17, 28, 8, 9, 0.90f, 0.90f, 0.93f);  // upper arm
-    drawRect(-18, 28, 3, 9, 0.65f, 0.65f, 0.70f);  // shoulder ring
-    drawRect(-24, 29, 7, 7, 0.88f, 0.88f, 0.92f);  // forearm
-    drawRect(-26, 29, 3, 7, 0.65f, 0.65f, 0.70f);  // elbow ring
-    drawRect(-31, 28, 6, 9, 0.30f, 0.30f, 0.35f);  // glove
-
-    // ── RIGHT ARM ─────────────────────────────────────────────
-    drawRect( 9, 28, 8, 9, 0.90f, 0.90f, 0.93f);   // upper arm
-    drawRect(15, 28, 3, 9, 0.65f, 0.65f, 0.70f);   // shoulder ring
-    drawRect(17, 29, 7, 7, 0.88f, 0.88f, 0.92f);   // forearm
-    drawRect(23, 29, 3, 7, 0.65f, 0.65f, 0.70f);   // elbow ring
-    drawRect(25, 28, 6, 9, 0.30f, 0.30f, 0.35f);   // glove
+    drawRect(-7, 37, 14, 4, 0.65f, 0.65f, 0.70f);
 
     // ── HELMET ────────────────────────────────────────────────
-    // Helmet shell (big white circle)
-    drawCircle(0, 48, 10, 40, 1.00f, 1.00f, 1.00f);
-    // Gold visor band ring around helmet
-    glColor3f(0.80f, 0.65f, 0.10f);
-    glLineWidth(3.0f);
-    glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < 40; i++) {
-        float t = i * 2.0f * 3.1416f / 40;
-        glVertex2f(0 + 10.5f * cosf(t), 48 + 10.5f * sinf(t));
-    }
-    glEnd();
-    // Dark blue visor window
-    drawCircle(0, 48, 7, 30, 0.10f, 0.20f, 0.50f);
-    // Visor gold tint overlay (top half — reflective gold)
-    glColor3f(0.70f, 0.55f, 0.05f);
+    drawCircle(0, 48, 11, 40, 1.00f, 1.00f, 1.00f);
+    glColor3f(0.85f, 0.85f, 0.88f);
     glBegin(GL_TRIANGLE_FAN);
         glVertex2f(0, 48);
-        for (int i = 0; i <= 20; i++) {
-            float t = i * 3.1416f / 20; // top semicircle
-            glVertex2f(0 + 7.0f * cosf(t), 48 + 7.0f * sinf(t));
+        for (int i = 20; i <= 40; i++) {
+            float t = i * 3.14159f / 20;
+            glVertex2f(0 + 11.0f * cosf(t), 48 + 11.0f * sinf(t));
         }
     glEnd();
-    // Visor reflection glare (small bright spot)
-    drawCircle(-3, 51, 1.8f, 15, 1.00f, 1.00f, 1.00f);
-    drawCircle(-2, 50, 0.8f, 10, 1.00f, 1.00f, 0.90f);
-    // Helmet light (small lamp on top-left of helmet)
-    drawCircle(-6, 54, 1.5f, 12, 1.00f, 1.00f, 0.60f);
+    drawCircle(0, 48, 8, 30, 0.05f, 0.1f, 0.2f);
+    glColor3f(0.8f, 0.6f, 0.1f);
+    glBegin(GL_TRIANGLE_FAN);
+        glVertex2f(0, 48);
+        for (int i = 0; i <= 15; i++) {
+            float t = i * 3.14159f / 15;
+            glVertex2f(0 + 8.0f * cosf(t), 48 + 8.0f * sinf(t));
+        }
+    glEnd();
+    drawCircle(-3, 51, 2.5f, 15, 1.0f, 1.0f, 1.0f);
+    drawCircle(-1.5f, 49.5f, 1.0f, 10, 0.9f, 0.9f, 0.9f);
+    drawCircle(-9, 55, 2.0f, 15, 1.0f, 1.0f, 0.5f);
 
     glPopMatrix();
 }
@@ -760,74 +785,24 @@ void drawTravelScene()
 // ============================================================
 //  DRAW: Wake-up ending after the warning transmission
 // ============================================================
-void drawWakeUpFigure(float standProgress, float headLift, float headTurn)
-{
-    (void)standProgress;
-
-    glPushMatrix();
-    glTranslatef(0, -6, 0);
-
-    glColor3f(0.8f, 0.3f, 0.3f);
-    glBegin(GL_POLYGON);
-        glVertex2f(-35, -10); glVertex2f(-25, 5);
-        glVertex2f( -5,   5); glVertex2f(  7,-10);
-    glEnd();
-    drawRect(-35.0f, -12.0f, 41.0f, 5.0f, 1.0f, 0.8f, 0.6f);
-    drawCircle(-15,-10, 5, 10, 1.0f, 0.8f, 0.6f);
-
-    glPushMatrix();
-    glTranslatef(-15.0f, 12.0f + headLift, 0.0f);
-    glRotatef(headTurn, 0, 0, 1);
-    glTranslatef(15.0f, -12.0f - headLift, 0.0f);
-
-    drawCircle(-15, 22 + headLift, 11, 30, 0.1f, 0.1f, 0.1f);
-    drawCircle(-20, 15 + headLift, 9,  30, 0.1f, 0.1f, 0.1f);
-    drawCircle(-10, 15 + headLift, 9,  30, 0.1f, 0.1f, 0.1f);
-    drawRect(-27.5f, 1 + headLift, 25, 17, 0.1f, 0.1f, 0.1f);
-    drawCircle(-15, 12 + headLift, 10, 30, 1.0f, 0.8f, 0.6f);
-
-    if (headLift < 2.0f)
-    {
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glLineWidth(2.0f);
-        glBegin(GL_LINES);
-            glVertex2f(-19.5f,13.5f + headLift); glVertex2f(-16.5f,13.5f + headLift);
-            glVertex2f(-13.5f,13.5f + headLift); glVertex2f(-10.5f,13.5f + headLift);
-        glEnd();
-        drawCircle(-15, 7 + headLift, 1, 10, 0.0f, 0.0f, 0.0f);
-        glBegin(GL_LINES);
-            glVertex2f(-20,16 + headLift); glVertex2f(-17,16 + headLift);
-            glVertex2f(-13,16 + headLift); glVertex2f(-10,16 + headLift);
-        glEnd();
-    }
-    else
-    {
-        drawCircle(-18,14 + headLift, 1.5f,10,1.0f,1.0f,1.0f);
-        drawCircle(-12,14 + headLift, 1.5f,10,1.0f,1.0f,1.0f);
-        drawCircle(-18,13.5f + headLift,0.8f,10,0.0f,0.0f,0.0f);
-        drawCircle(-12,13.5f + headLift,0.8f,10,0.0f,0.0f,0.0f);
-        glColor3f(0.8f,0.2f,0.2f);
-        glLineWidth(2.0f);
-        glBegin(GL_LINES);
-            glVertex2f(-18,8 + headLift); glVertex2f(-15,9 + headLift);
-            glVertex2f(-15,9 + headLift); glVertex2f(-12,8 + headLift);
-            glColor3f(0.0f,0.0f,0.0f);
-            glVertex2f(-21,17 + headLift); glVertex2f(-17,19 + headLift);
-            glVertex2f(-14,19 + headLift); glVertex2f(-10,17 + headLift);
-        glEnd();
-    }
-
-    glPopMatrix();
-    drawCircle(-15, 4,  4, 20, 1.0f, 0.8f, 0.6f);
-    glPopMatrix();
-}
-
 void wakeUpFunction()
 {
     glPushMatrix();
 
-    drawRect(-100, -20, 200, 120, 0.0f, 0.2f, 2.0f);
-    drawRect(-100, -100, 200, 80, 1.0f, 0.5f, 0.0f);
+    // Morning lighting
+    glBegin(GL_QUADS);
+        glColor3f(0.53f, 0.81f, 0.98f);
+        glVertex2f(-100, 100); glVertex2f(100, 100);
+        glColor3f(0.26f, 0.40f, 0.49f);
+        glVertex2f(100, -20); glVertex2f(-100, -20);
+    glEnd();
+    // Floor with depth
+    glBegin(GL_QUADS);
+        glColor3f(0.85f, 0.45f, 0.1f);
+        glVertex2f(-100, -20); glVertex2f(100, -20);
+        glColor3f(0.5f, 0.25f, 0.05f);
+        glVertex2f(100, -100); glVertex2f(-100, -100);
+    glEnd();
 
     drawRect(-75, 40, 25, 30, 0.3f, 0.2f, 0.1f);
     drawRect(-72, 43, 19, 24, 0.9f, 0.9f, 1.0f);
@@ -848,41 +823,164 @@ void wakeUpFunction()
     drawRect(5,   -2, 20, 4, 0.4f, 0.2f, 0.1f);
     glPopMatrix();
 
-    drawRect(-5, -60, 4, 35, 0.3f, 0.15f, 0.05f);
-    drawRect(-35, -30, 40, 10, 0.4f, 0.2f, 0.1f);
-    drawRect(-25, -60, 8, 39, 1.0f, 0.8f, 0.6f);
-    drawRect(-13, -60, 8, 39, 1.0f, 0.8f, 0.6f);
-    drawRect(-27, -65, 10, 5, 0.5f, 0.0f, 0.0f);
-    drawRect(-14, -65, 10, 5, 0.5f, 0.0f, 0.0f);
+    // GIRL BODY (Behind Desk)
+    glPushMatrix();
+    glTranslatef(0, -6, 0);
 
-    drawRect(-80, -24, 160, 17, 0.54f, 0.27f, 0.07f);
-    drawRect(-80, -24, 160,  4, 0.44f, 0.22f, 0.05f);
-    drawRect(-65, -80, 8, 60, 0.36f, 0.18f, 0.05f);
-    drawRect( 57, -80, 8, 60, 0.36f, 0.18f, 0.05f);
+    // Chair (behind girl)
+    drawRect(-28, -45, 26, 25, 0.35f, 0.18f, 0.08f);
+    drawRect(-26, -60, 3, 15, 0.2f, 0.1f, 0.02f);
+    drawRect( -7, -60, 3, 15, 0.2f, 0.1f, 0.02f);
 
-    drawRect(-60, -7, 20, 4, 0.2f, 0.2f, 0.2f);
-    drawCircle(-50, -5, 1.5f, 20, 0.4f, 0.4f, 0.4f);
+    // Legs (shorter, natural)
+    drawRect(-24, -55, 7, 25, 0.95f, 0.8f, 0.65f);
+    drawRect(-13, -55, 7, 25, 0.95f, 0.8f, 0.65f);
+    // Feet
+    drawRect(-26, -60, 9, 5, 0.4f, 0.1f, 0.1f);
+    drawRect(-14, -60, 9, 5, 0.4f, 0.1f, 0.1f);
+
+    // Torso
+    glColor3f(0.85f, 0.35f, 0.35f);
+    glBegin(GL_POLYGON);
+        glVertex2f(-26, -28); glVertex2f(-22, 5);
+        glVertex2f( -8,   5); glVertex2f( -4,-28);
+    glEnd();
+
+    // Neck
+    drawCircle(-15, 5, 3.5f, 20, 1.0f, 0.8f, 0.6f);
+
+    // Head
+    glPushMatrix();
+    glTranslatef(-15.0f, 16.0f + wakeHeadLift, 0.0f);
+    glRotatef(wakeHeadTurn, 0, 0, 1);
+    glTranslatef(15.0f, -16.0f - wakeHeadLift, 0.0f);
+
+    // Hair Back
+    drawCircle(-15, 20 + wakeHeadLift, 12, 30, 0.1f, 0.1f, 0.1f);
+    drawCircle(-22, 12 + wakeHeadLift, 10, 30, 0.1f, 0.1f, 0.1f);
+    drawCircle(-8,  12 + wakeHeadLift, 10, 30, 0.1f, 0.1f, 0.1f);
+    drawRect(-28, -2 + wakeHeadLift, 26, 16, 0.1f, 0.1f, 0.1f);
+
+    drawCircle(-15, 16 + wakeHeadLift, 10.0f, 30, 1.0f, 0.8f, 0.6f);
+
+    if (wakeHeadLift < 2.0f)
+    {
+        // Still groggy / waking up
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glLineWidth(2.0f);
+        glBegin(GL_LINES);
+            glVertex2f(-19.5f,15.5f + wakeHeadLift); glVertex2f(-16.5f,15.5f + wakeHeadLift);
+            glVertex2f(-13.5f,15.5f + wakeHeadLift); glVertex2f(-10.5f,15.5f + wakeHeadLift);
+        glEnd();
+        drawCircle(-15, 11 + wakeHeadLift, 1, 10, 0.0f, 0.0f, 0.0f);
+        glBegin(GL_LINES);
+            glVertex2f(-20,18 + wakeHeadLift); glVertex2f(-17,18 + wakeHeadLift);
+            glVertex2f(-13,18 + wakeHeadLift); glVertex2f(-10,18 + wakeHeadLift);
+        glEnd();
+    }
+    else
+    {
+        // Awake and surprised
+        drawCircle(-18,17 + wakeHeadLift, 2.0f,15,1.0f,1.0f,1.0f);
+        drawCircle(-12,17 + wakeHeadLift, 2.0f,15,1.0f,1.0f,1.0f);
+        drawCircle(-18,16.5f + wakeHeadLift,1.0f,10,0.1f,0.1f,0.2f);
+        drawCircle(-12,16.5f + wakeHeadLift,1.0f,10,0.1f,0.1f,0.2f);
+        glColor3f(0.8f,0.2f,0.2f);
+        glLineWidth(2.0f);
+        drawCircle(-15, 12.0f + wakeHeadLift, 1.5f, 10, 0.1f, 0.0f, 0.0f);
+        glColor3f(0.2f,0.1f,0.1f);
+        glBegin(GL_LINES);
+            glVertex2f(-21,20 + wakeHeadLift); glVertex2f(-17,22 + wakeHeadLift);
+            glVertex2f(-14,22 + wakeHeadLift); glVertex2f(-10,20 + wakeHeadLift);
+        glEnd();
+    }
+
+    glPopMatrix();
+    glPopMatrix();
+
+    // DESK (In Front of Girl Body)
+    // Wider Desk for better composition
+    drawRect(-40, -60, 4, 30, 0.3f, 0.15f, 0.05f); // Left leg
+    drawRect( 25, -60, 4, 30, 0.3f, 0.15f, 0.05f); // Right leg
+    drawRect(-45, -30, 75, 10, 0.45f, 0.25f, 0.15f); // Desk top (X: -45 to 30)
+    drawRect(-45, -35, 75,  5, 0.3f, 0.15f, 0.05f);  // Desk rim
+
+    // GIRL ARMS (Over Desk)
+    glPushMatrix();
+    glTranslatef(0, -6, 0);
+    // Arms on desk (slightly moved up by headLift to simulate waking stretch)
+    glPushMatrix(); glTranslatef(-25, wakeHeadLift*0.5f, 0); glRotatef(30 - wakeHeadLift*5, 0, 0, 1);
+    drawRect(-3, -20, 6, 22, 0.75f, 0.25f, 0.25f);
+    drawCircle(0, -20, 3, 10, 1.0f, 0.8f, 0.6f); glPopMatrix();
+    
+    glPushMatrix(); glTranslatef(-5, wakeHeadLift*0.5f, 0); glRotatef(-30 + wakeHeadLift*5, 0, 0, 1);
+    drawRect(-3, -20, 6, 22, 0.75f, 0.25f, 0.25f);
+    drawCircle(0, -20, 3, 10, 1.0f, 0.8f, 0.6f); glPopMatrix();
+    glPopMatrix();
+
+    // OBJECTS ON DESK
+    // Lamp Base (Lamp OFF)
+    glPushMatrix();
+    glTranslatef(20, -13, 0); // Move lamp onto the right side of the desk
+    drawRect(-60, -7, 20, 4, 0.15f, 0.15f, 0.15f);
+    drawRect(-51, -3, 2, 18, 0.25f, 0.25f, 0.25f);
     glColor3f(0.8f, 0.1f, 0.1f);
     glBegin(GL_QUADS);
         glVertex2f(-65, 15); glVertex2f(-35, 15);
         glVertex2f(-42, 28); glVertex2f(-58, 28);
     glEnd();
-    drawRect(-51, -3, 2, 18, 0.3f, 0.3f, 0.3f);
+    drawCircle(-50, -5, 1.5f, 20, 0.4f, 0.4f, 0.4f); // base button OFF
+    glPopMatrix();
 
-    drawWakeUpFigure(wakeStandProgress, wakeHeadLift, wakeHeadTurn);
+    // Moderate two-layer cabinet beside the window.
+    drawRect(44, -20, 36, 56, 0.45f, 0.23f, 0.08f);
+    drawRect(47, 8, 30, 25, 0.58f, 0.32f, 0.12f);
+    drawRect(47, -17, 30, 25, 0.58f, 0.32f, 0.12f);
+    drawRect(60, 9, 2, 23, 0.35f, 0.17f, 0.06f);
+    drawRect(60, -16, 2, 23, 0.35f, 0.17f, 0.06f);
+    drawCircle(57, 20, 1.5f, 12, 0.95f, 0.78f, 0.25f);
+    drawCircle(67, 20, 1.5f, 12, 0.95f, 0.78f, 0.25f);
+    drawCircle(57, -5, 1.5f, 12, 0.95f, 0.78f, 0.25f);
+    drawCircle(67, -5, 1.5f, 12, 0.95f, 0.78f, 0.25f);
 
+    // Plant on top of cabinet
     glColor3f(0.6f, 0.3f, 0.2f);
     glBegin(GL_QUADS);
-        glVertex2f(50,8); glVertex2f(70,8);
-        glVertex2f(66,-8); glVertex2f(54,-8);
+        glVertex2f(50, 52); glVertex2f(70, 52);
+        glVertex2f(66, 36); glVertex2f(54, 36);
     glEnd();
-    drawRect(59, 8, 2, 15, 0.13f, 0.35f, 0.13f);
-    drawCircle(60, 23, 10, 20, 0.13f, 0.55f, 0.13f);
-    drawCircle(52, 18,  7, 20, 0.13f, 0.45f, 0.13f);
-    drawCircle(68, 18,  7, 20, 0.13f, 0.45f, 0.13f);
+    drawRect(59, 52, 2, 15, 0.13f, 0.35f, 0.13f);
+    drawCircle(60, 67, 10, 20, 0.13f, 0.55f, 0.13f);
+    drawCircle(52, 62,  7, 20, 0.13f, 0.45f, 0.13f);
+    drawCircle(68, 62,  7, 20, 0.13f, 0.45f, 0.13f);
 
+    // Laptop
+    glPushMatrix();
+    glTranslatef(-2, -20, 0);
+    drawRect(-6, 0, 12, 8, 0.8f, 0.8f, 0.85f);
+    drawRect(-5, 1, 10, 6, 0.1f, 0.1f, 0.15f);
+    drawRect(-8, -2, 16, 2, 0.7f, 0.7f, 0.75f);
+    glPopMatrix();
+
+    // Books on Table
+    glPushMatrix();
+    glTranslatef(10, -20, 0);
+    drawRect(0, 0, 10, 3, 0.2f, 0.4f, 0.8f);
+    drawRect(0, 3, 9, 3, 0.8f, 0.3f, 0.2f);
+    drawRect(-1, 6, 10, 3, 0.1f, 0.6f, 0.3f);
+    glPushMatrix();
+    glTranslatef(-1, 9, 0);
+    glRotatef(12, 0, 0, 1);
+    drawRect(0, 0, 10, 2.5f, 0.8f, 0.7f, 0.1f);
+    glPopMatrix();
+    glPopMatrix();
+
+    // Clock on Table
+    glPushMatrix();
+    glTranslatef(-3, -12, 0);
     drawCircle(25, 0, 8, 30, 0.8f, 0.0f, 0.0f);
     drawCircle(25, 0, 7, 30, 1.0f, 1.0f, 1.0f);
+    
     glPushMatrix();
     glTranslatef(25, 0, 0);
     glColor3f(0.8f, 0.0f, 0.0f);
@@ -891,22 +989,17 @@ void wakeUpFunction()
     glRotatef(-clockAngle * 12, 0, 0, 1);
     glBegin(GL_LINES); glVertex2f(0,0); glVertex2f(0,6); glEnd();
     glPopMatrix();
-    glBegin(GL_LINES); glVertex2f(0,0); glVertex2f(4,0); glEnd();
     glPushMatrix();
     glRotatef(-clockAngle, 0, 0, 1);
     glBegin(GL_LINES); glVertex2f(0,0); glVertex2f(4,0); glEnd();
     glPopMatrix();
     glPopMatrix();
+    
+    // Clock legs
     glBegin(GL_TRIANGLES);
         glVertex2f(25,0); glVertex2f(20,-8); glVertex2f(30,-8);
     glEnd();
-
-    drawRect(-75, -7, 22, 3, 0.2f, 0.3f, 0.7f);
-    drawRect(-74, -4, 22, 3, 0.3f, 0.6f, 0.3f);
-    drawRect(-76, -1, 22, 3, 0.8f, 0.4f, 0.2f);
-    drawRect(-75,  2, 22, 3, 0.8f, 0.7f, 0.2f);
-    drawRect(-76,-10, 22, 3, 0.2f, 0.1f, 0.7f);
-    drawRect(-75,-13, 22, 3, 0.2f, 0.3f, 0.1f);
+    glPopMatrix();
 
     drawCircle(mouseX,    -88, 3,   20, 0.6f, 0.3f, 0.1f);
     drawCircle(mouseX+3,  -88, 1.8f,20, 0.6f, 0.3f, 0.1f);
@@ -929,7 +1022,6 @@ void wakeUpFunction()
 
     glPopMatrix();
 }
-
 void drawWallScene()
 {
     glPushMatrix();
@@ -947,9 +1039,30 @@ void drawWallScene()
     glScalef(zoom, zoom, 1.0f);
     glTranslatef(0.0f, -43.0f, 0.0f);
 
-    // original room.
-    drawRect(-100, -20, 200, 120, 0.0f, 0.2f, 2.0f);
+    // original room wall with depth gradient
+    glBegin(GL_QUADS);
+        glColor3f(0.0f, 0.25f, 1.0f); // Top wall
+        glVertex2f(-100, 100); glVertex2f(100, 100);
+        glColor3f(0.0f, 0.2f, 0.8f);
+        glVertex2f(100, 40);   glVertex2f(-100, 40);
+        
+        glColor3f(0.0f, 0.2f, 0.8f);
+        glVertex2f(-100, 40);  glVertex2f(100, 40);
+        glColor3f(0.0f, 0.1f, 0.4f); // Bottom wall
+        glVertex2f(100, -20);  glVertex2f(-100, -20);
+    glEnd();
+
     drawRect(-100, -100, 200, 80, 1.0f, 0.5f, 0.0f);
+
+    // Ceiling Fan in Wall Scene
+    drawRect(-1, 80, 2, 20, 0.2f, 0.2f, 0.2f);
+    glPushMatrix();
+    glTranslatef(0, 80, 0);
+    glRotatef(fanAngle, 0, 0, 1);
+    drawCircle(0, 0, 4, 20, 0.3f, 0.3f, 0.3f);
+    drawRect(-25, -2, 20, 4, 0.4f, 0.2f, 0.1f);
+    drawRect(5,   -2, 20, 4, 0.4f, 0.2f, 0.1f);
+    glPopMatrix();
 
     // Center window on the wall.
     drawRect(-35, 11, 70, 64, 0.28f, 0.16f, 0.08f);
@@ -981,6 +1094,17 @@ void drawWallScene()
     drawCircle(67, 20, 1.5f, 12, 0.95f, 0.78f, 0.25f);
     drawCircle(57, -5, 1.5f, 12, 0.95f, 0.78f, 0.25f);
     drawCircle(67, -5, 1.5f, 12, 0.95f, 0.78f, 0.25f);
+
+    // Plant on top of cabinet (Consistent with room scenes)
+    glColor3f(0.6f, 0.3f, 0.2f);
+    glBegin(GL_QUADS);
+        glVertex2f(50, 52); glVertex2f(70, 52);
+        glVertex2f(66, 36); glVertex2f(54, 36);
+    glEnd();
+    drawRect(59, 52, 2, 15, 0.13f, 0.35f, 0.13f);
+    drawCircle(60, 67, 10, 20, 0.13f, 0.55f, 0.13f);
+    drawCircle(52, 62,  7, 20, 0.13f, 0.45f, 0.13f);
+    drawCircle(68, 62,  7, 20, 0.13f, 0.45f, 0.13f);
 
     // Three shoeboxes
     drawRect(-76, -20, 14, 8, 0.72f, 0.18f, 0.10f);
@@ -1106,12 +1230,12 @@ void drawMarsScene()
         return;
     }
 
-    // ── Sky (reddish-orange Martian sky) ──────────────────────
+    // ── Sky (Deep atmospheric Martian sky) ──────────────────────
     glBegin(GL_QUADS);
-        glColor3f(0.6f, 0.2f, 0.05f);  // horizon
+        glColor3f(0.7f, 0.25f, 0.08f);  // horizon glow
         glVertex2f(-100, -100);
         glVertex2f( 100, -100);
-        glColor3f(0.3f, 0.05f, 0.0f);  // top dark red
+        glColor3f(0.2f, 0.02f, 0.0f);  // top deep space red
         glVertex2f( 100,  100);
         glVertex2f(-100,  100);
     glEnd();
@@ -1129,21 +1253,20 @@ void drawMarsScene()
     for (int i = 0; i < 100; i++) // fewer stars visible
         drawCircle(starX[i], starY[i], 0.2f, 5, 0.8f, 0.7f, 0.7f);
 
-    // Mars surface ground
-    // Base ground
-    drawRect(-100, -100, 200, 50, 0.6f, 0.2f, 0.0f);
-    // Surface layer
-    drawRect(-100, -52, 200, 5, 0.7f, 0.3f, 0.1f);
-    // Rocks / craters
-    drawCircle(-70, -50, 8, 20, 0.5f, 0.15f, 0.0f);
-    drawCircle(-68, -50, 5, 20, 0.45f, 0.12f, 0.0f);
-    drawCircle( 60, -50, 10, 20, 0.5f, 0.15f, 0.0f);
-    drawCircle( 62, -50, 6,  20, 0.45f, 0.12f, 0.0f);
-    // Small rocks
-    drawCircle(-40, -51, 3, 10, 0.55f, 0.2f, 0.05f);
-    drawCircle( 30, -51, 4, 10, 0.55f, 0.2f, 0.05f);
-    drawCircle( 10, -51, 2, 10, 0.55f, 0.2f, 0.05f);
-    // Distant mountains
+    // Phobos & Deimos (Mars moons)
+    drawCircle(75, 70, 6, 20, 0.6f, 0.5f, 0.45f);
+    drawCircle(73, 72, 1, 10, 0.5f, 0.4f, 0.35f); // crater
+    drawCircle(-60, 65, 3.5f, 20, 0.55f, 0.45f, 0.4f);
+
+    // Distant mountain layer (Parallax depth 1)
+    glColor3f(0.4f, 0.1f, 0.0f);
+    glBegin(GL_TRIANGLES);
+        glVertex2f(-100, -20); glVertex2f(-60, 20); glVertex2f(-20, -20);
+        glVertex2f( -30, -20); glVertex2f(  5,  25); glVertex2f( 40, -20);
+        glVertex2f(  30, -20); glVertex2f( 70,  15); glVertex2f(100, -20);
+    glEnd();
+
+    // Mid mountain layer (Parallax depth 2)
     glColor3f(0.5f, 0.15f, 0.0f);
     glBegin(GL_TRIANGLES);
         glVertex2f(-100, -50); glVertex2f(-70, -10); glVertex2f(-40, -50);
@@ -1151,11 +1274,22 @@ void drawMarsScene()
         glVertex2f(  50, -50); glVertex2f( 80,  -8); glVertex2f(100, -50);
     glEnd();
 
-    // Phobos (Mars moon)
-    drawCircle(75, 70, 6, 20, 0.7f, 0.6f, 0.5f);
-    drawCircle(73, 72, 1, 10, 0.6f, 0.5f, 0.4f); // crater
+    // Mars surface ground
+    drawRect(-100, -100, 200, 50, 0.65f, 0.22f, 0.02f);
+    // Surface layer edge
+    drawRect(-100, -52, 200, 5, 0.75f, 0.32f, 0.1f);
+    
+    // Rocks / craters with shading
+    drawCircle(-70, -50, 8, 20, 0.55f, 0.18f, 0.0f);
+    drawCircle(-68, -50, 5, 20, 0.45f, 0.12f, 0.0f);
+    drawCircle( 60, -50, 10, 20, 0.55f, 0.18f, 0.0f);
+    drawCircle( 62, -50, 6,  20, 0.45f, 0.12f, 0.0f);
+    // Small rocks
+    drawCircle(-40, -51, 3, 10, 0.6f, 0.22f, 0.05f);
+    drawCircle( 30, -51, 4, 10, 0.6f, 0.22f, 0.05f);
+    drawCircle( 10, -51, 2, 10, 0.6f, 0.22f, 0.05f);
 
-    //  Rocket flying from space → Mars
+    //  Rocket flying from space -> Mars
     if (marsPhase == 0)
     {
         float flicker = (sinf(marsTimer * 15.0f) + 1.0f) * 0.5f;
@@ -1180,16 +1314,7 @@ void drawMarsScene()
     if (marsPhase >= 1 && marsPhase < 5)
     {
         // Rocket sitting on ground (no flame)
-        drawRocketAt(0, -50, 0.0f);
-        // Landing legs
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glLineWidth(2.0f);
-        glBegin(GL_LINES);
-            glVertex2f(-5, -50); glVertex2f(-14, -56);
-            glVertex2f( 5, -50); glVertex2f( 14, -56);
-        glEnd();
-        drawRect(-18, -58, 8, 3, 0.6f, 0.6f, 0.6f); // left foot pad
-        drawRect(  9, -58, 8, 3, 0.6f, 0.6f, 0.6f); // right foot pad
+        drawRocketAt(0, -45.0f, 0.0f); // Rebalanced Y for 1.7f scale
     }
 
     // Girl walks out of rocket
@@ -1215,16 +1340,12 @@ void drawMarsScene()
     // Aliens appear
     if (marsPhase >= 1 && marsPhase <= 5)
     {
-        // Alien 1 (green, left side) — walks in from left
         glPushMatrix();
         glTranslatef((1.0f - alienAppear) * 85.0f, 0, 0);
-
-        // Alien 2 (purple, right side) — walks in from right
         drawAlienGroup();
         glPopMatrix();
     }
 
-    // Bottom hint
     if (marsPhase == 1 || marsPhase == 2)
     {
         drawAlienThreatText();
@@ -1259,19 +1380,15 @@ void drawMarsScene()
     {
         float flame = (sinf(marsTimer * 18.0f) + 1.0f) * 0.5f;
         drawRocketAt(0, escapeRocketY, flame);
-        glColor3f(1.0f, 0.5f, 0.05f);
-        drawCircle(0, escapeRocketY - 7, 10.0f + flame * 8.0f, 24, 1.0f, 0.35f, 0.0f);
         glColor3f(1.0f, 0.8f, 0.25f);
         drawText(-36, 80, "Escape!", GLUT_BITMAP_HELVETICA_18);
     }
 
     glColor3f(0.6f, 0.4f, 0.3f);
-    drawText(-43, -95, "Mars mission in progress. Press R to restart.", GLUT_BITMAP_HELVETICA_12);
+    drawText(-43, -95, "Mars mission in progress.", GLUT_BITMAP_HELVETICA_12);
 }
 
-
 //mouse callback
-
 void mouse(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
@@ -1293,17 +1410,27 @@ void mouse(int button, int state, int x, int y)
 
 void keyboard(unsigned char key, int x, int y)
 {
-    if (key == 13) // ENTER key
+    // Scene jump system
+    if (key >= '1' && key <= '7')
     {
-        if (isSpaceScene && !isMarsScene && !isTravelScene)
-        {
-            // rocket flies toward Mars
-            isTravelScene      = true;
-            travelTimer        = 0.0f;
-            marsApproachSize   = 5.0f;   // Mars starts tiny
-            rocketTravelX      = 0.0f;   // rocket centred
-            rocketTravelY      = -75.0f; // near bottom of screen
-        }
+        // Global resets
+        fanAngle = 0.0f; clockAngle = 0.0f; mouseX = -120.0f;
+        lampOn = false; isAsleep = false; isDreaming = false;
+        sleepTimer = 0.0f; zoomFactor = 1.0f;
+        isSpaceScene = false; isTravelScene = false; isMarsScene = false;
+        isWakeUpScene = false; isWallScene = false; isWindowSpaceScene = false;
+        starsInitialized = false; aliensInitialized = false;
+        
+        if (key == '1') { /* Original Room - already reset */ }
+        if (key == '2') { isSpaceScene = true; sleepTimer = 11.0f; zoomFactor = 21.0f; rocketY = -120.0f; }
+        if (key == '3') { isTravelScene = true; travelTimer = 0.0f; marsApproachSize = 5.0f; }
+        if (key == '4') { isMarsScene = true; marsPhase = 0; marsTimer = 0.0f; marsPhaseTimer = 0.0f; marsRocketLandY = 90.0f; }
+        if (key == '5') { isWakeUpScene = true; wakeTimer = 0.0f; wakeHeadLift = 0.0f; wakeHeadTurn = 0.0f; }
+        if (key == '6') { isWallScene = true; wallSceneTimer = 0.0f; }
+        if (key == '7') { isWindowSpaceScene = true; windowSpaceTimer = 0.0f; }
+        
+        glutPostRedisplay();
+        return;
     }
 
     if (key == 'r' || key == 'R') // Restart everything
@@ -1318,11 +1445,14 @@ void keyboard(unsigned char key, int x, int y)
         isTravelScene = false; marsApproachSize = 5.0f; travelTimer = 0.0f;
         isMarsScene = false; marsTransition = false;
         marsPhase = 0; marsTimer = 0.0f; marsPhaseTimer = 0.0f;
-        alienAppear = 0.0f; girlWalkX = 8.0f; escapeRocketY = -50.0f; warningAlpha = 0.0f;
+        alienAppear = 0.0f; girlWalkX = 8.0f; escapeRocketY = -45.0f; warningAlpha = 0.0f;
         isWakeUpScene = false;
+        isWallScene = false;
         isWindowSpaceScene = false;
         wakeTimer = 0.0f; wakeHeadLift = 0.0f;
         wakeStandProgress = 0.0f; wakeHeadTurn = 0.0f;
+        aliensInitialized = false;
+        glutPostRedisplay();
     }
 }
 
@@ -1363,9 +1493,9 @@ void display()
     else if (isSpaceScene)
     {
         glBegin(GL_QUADS);
-            glColor3f(0.1f, 0.0f, 0.2f);
+            glColor3f(0.02f, 0.0f, 0.08f);
             glVertex2f(-100, -100); glVertex2f(100, -100);
-            glColor3f(0.0f, 0.0f, 0.3f);
+            glColor3f(0.0f, 0.0f, 0.15f);
             glVertex2f(100, 100);   glVertex2f(-100, 100);
         glEnd();
 
@@ -1378,85 +1508,212 @@ void display()
             }
             starsInitialized = true;
         }
-        for (int i = 0; i < 300; i++)
-            drawCircle(starX[i], starY[i], 0.3f, 5, 1.0f, 1.0f, 1.0f);
+        
+        // Background Stars & subtle space debris
+        for (int i = 0; i < 300; i++) {
+            float twinkle = (sinf(sleepTimer * 3.0f + i) + 1.0f) * 0.5f;
+            drawCircle(starX[i], starY[i], 0.3f + twinkle*0.2f, 5, 0.8f + twinkle*0.2f, 0.8f + twinkle*0.2f, 0.9f + twinkle*0.1f);
+        }
+        
+        // Fast moving meteors (parallax)
+        for (int i = 0; i < 5; i++) {
+            float mX = fmodf((starX[i*10] + sleepTimer * (40.0f + i*10.0f)), 250.0f) - 125.0f;
+            float mY = starY[i*10];
+            glColor3f(0.8f, 0.9f, 1.0f);
+            glBegin(GL_LINES);
+                glVertex2f(mX, mY);
+                glVertex2f(mX - 15.0f - i*5.0f, mY - 2.0f);
+            glEnd();
+            drawCircle(mX, mY, 0.4f, 6, 1.0f, 1.0f, 1.0f);
+        }
 
-        // Solar System
-        drawCircle(-70, 0, 20, 50, 1.0f, 0.7f, 0.0f);
+        // Solar System Sun Glow
+        drawCircle(-70, 0, 26, 40, 1.0f, 0.3f, 0.0f); // outer glow
+        drawCircle(-70, 0, 22, 50, 1.0f, 0.6f, 0.0f); // mid glow
+        drawCircle(-70, 0, 18, 50, 1.0f, 0.8f, 0.2f); // core
 
+        // Mercury
         glPushMatrix();
         glTranslatef(-70, 0, 0); glRotatef(mercuryAngle, 0, 0, 1);
-        drawCircle(30, 0, 3, 20, 0.7f, 0.5f, 0.3f);
+        drawCircle(30, 0, 3, 20, 0.6f, 0.4f, 0.3f);
+        drawCircle(30, 0, 1.5f, 20, 0.8f, 0.6f, 0.5f); // highlight
         glPopMatrix();
 
+        // Venus
         glPushMatrix();
         glTranslatef(-70, 0, 0); glRotatef(venusAngle, 0, 0, 1);
-        drawCircle(45, 0, 5, 20, 0.9f, 0.6f, 0.2f);
+        drawCircle(45, 0, 5, 20, 0.9f, 0.5f, 0.1f);
+        drawCircle(45, 0, 3.5f, 20, 0.95f, 0.7f, 0.3f);
         glPopMatrix();
 
+        // Earth & Moon
         glPushMatrix();
         glTranslatef(-70, 0, 0); glRotatef(earthAngle, 0, 0, 1);
-        drawCircle(65, 0, 6, 20, 0.2f, 0.4f, 0.8f);
+        drawCircle(65, 0, 7, 25, 0.1f, 0.3f, 0.7f); // Ocean
+        drawCircle(65, 0, 5, 20, 0.2f, 0.5f, 0.8f); // inner
+        // Continents approx
+        drawCircle(63, 2, 2.5f, 12, 0.2f, 0.7f, 0.2f);
+        drawCircle(66, -1, 3.0f, 12, 0.2f, 0.6f, 0.1f);
+        // Atmosphere
+        glColor3f(0.5f, 0.7f, 1.0f);
+        glLineWidth(1.0f);
+        glBegin(GL_LINE_LOOP);
+        for(int i=0; i<30; i++) {
+            float a = i * 2.0f * 3.14159f / 30;
+            glVertex2f(65 + 7.5f*cosf(a), 0 + 7.5f*sinf(a));
+        }
+        glEnd();
+
         glPushMatrix();
         glTranslatef(65, 0, 0); glRotatef(earthAngle * 2, 0, 0, 1);
-        drawCircle(10, 0, 1.5f, 15, 0.8f, 0.8f, 0.8f);
+        drawCircle(12, 0, 1.8f, 15, 0.7f, 0.7f, 0.7f);
+        drawCircle(12, 0, 1.0f, 10, 0.9f, 0.9f, 0.9f);
         glPopMatrix();
         glPopMatrix();
 
-        // Mars
+        // Mars & Moons
         glPushMatrix();
         glTranslatef(-70, 0, 0); glRotatef(earthAngle * 0.5f, 0, 0, 1);
-        drawCircle(85, 0, 5, 20, 0.8f, 0.3f, 0.1f); // Mars
+        drawCircle(88, 0, 5.5f, 25, 0.7f, 0.2f, 0.05f); // Dark Mars
+        drawCircle(88, 0, 4.0f, 20, 0.85f, 0.35f, 0.1f); // Bright Mars
+        // Phobos
+        drawCircle(88 + 9*cosf(sleepTimer*1.5f), 9*sinf(sleepTimer*1.5f), 1.0f, 10, 0.6f, 0.5f, 0.5f);
+        // Deimos
+        drawCircle(88 + 14*cosf(sleepTimer*0.8f), 14*sinf(sleepTimer*0.8f), 0.8f, 8, 0.7f, 0.6f, 0.6f);
         glPopMatrix();
 
-        // Rocket
+        // Big Cinematic Rocket
         glPushMatrix();
-        glTranslatef(60, rocketY, 0);
-        drawRect(-5, 0, 10, 25, 0.9f, 0.9f, 0.9f);
-        glColor3f(1.0f, 0.0f, 0.0f);
+        glTranslatef(30, rocketY, 0);
+        glScalef(2.5f, 2.5f, 1.0f); // Make rocket 2.5x larger, overall ~ 4x taller relative to astronaut
+
+        // Engine and Flame
+        float spaceFlame = (sinf(sleepTimer * 20.0f) + 1.0f) * 0.5f;
+        glColor3f(1.0f, 0.3f + spaceFlame * 0.3f, 0.0f);
         glBegin(GL_TRIANGLES);
-            glVertex2f(-5, 25); glVertex2f(5, 25); glVertex2f(0, 35);
+            glVertex2f(-6, 0); glVertex2f(6, 0); glVertex2f(0, -18.0f - spaceFlame * 10.0f);
         glEnd();
+        glColor3f(1.0f, 0.8f, 0.2f);
         glBegin(GL_TRIANGLES);
-            glVertex2f(-5, 0); glVertex2f(-12, 0); glVertex2f(-5, 8);
-            glVertex2f( 5, 0); glVertex2f( 12, 0); glVertex2f( 5, 8);
+            glVertex2f(-3, 0); glVertex2f(3, 0); glVertex2f(0, -10.0f - spaceFlame * 6.0f);
         glEnd();
-        drawCircle(0, 15, 3, 20, 0.1f, 0.2f, 0.5f);
-        float spaceFlame = (sinf(sleepTimer * 16.0f) + 1.0f) * 0.5f;
-        glColor3f(1.0f, 0.35f + spaceFlame * 0.35f, 0.0f);
+        
+        // Rocket Body
+        drawRect(-8, 0, 16, 45, 0.85f, 0.85f, 0.88f);
+        drawRect(-4, 0, 8, 45, 0.95f, 0.95f, 0.95f); // Highlight
+
+        // Nose Cone
+        glColor3f(0.8f, 0.1f, 0.1f);
         glBegin(GL_TRIANGLES);
-            glVertex2f(-4, 0); glVertex2f(4, 0); glVertex2f(0, -10.0f - spaceFlame * 8.0f);
+            glVertex2f(-8, 45); glVertex2f(8, 45); glVertex2f(0, 60);
         glEnd();
-        glColor3f(1.0f, 0.90f, 0.20f);
+        glColor3f(1.0f, 0.2f, 0.2f);
         glBegin(GL_TRIANGLES);
-            glVertex2f(-2, 0); glVertex2f(2, 0); glVertex2f(0, -6.0f - spaceFlame * 5.0f);
+            glVertex2f(-4, 45); glVertex2f(4, 45); glVertex2f(0, 58);
         glEnd();
+
+        // Fins
+        glColor3f(0.7f, 0.1f, 0.1f);
+        glBegin(GL_TRIANGLES);
+            glVertex2f(-8, 5); glVertex2f(-16, -5); glVertex2f(-8, 15);
+            glVertex2f( 8, 5); glVertex2f( 16, -5); glVertex2f( 8, 15);
+        glEnd();
+        
+        // Landing Gear/Struts
+        glColor3f(0.4f, 0.4f, 0.45f);
+        glLineWidth(2.0f);
+        glBegin(GL_LINES);
+            glVertex2f(-8, 8); glVertex2f(-12, -2);
+            glVertex2f( 8, 8); glVertex2f( 12, -2);
+        glEnd();
+
+        // Windows
+        drawCircle(0, 32, 4.5f, 20, 0.4f, 0.4f, 0.45f); // Rim
+        drawCircle(0, 32, 3.5f, 20, 0.1f, 0.2f, 0.5f);  // Glass
+        drawCircle(-1, 33, 1.0f, 10, 0.6f, 0.8f, 1.0f); // Reflection
+        
+        drawCircle(0, 18, 4.5f, 20, 0.4f, 0.4f, 0.45f); // Rim
+        drawCircle(0, 18, 3.5f, 20, 0.1f, 0.2f, 0.5f);  // Glass
+        drawCircle(-1, 19, 1.0f, 10, 0.6f, 0.8f, 1.0f); // Reflection
+        
+        // Body details
+        drawRect(-8, 25, 16, 2, 0.7f, 0.1f, 0.1f);
+        drawRect(-8, 11, 16, 2, 0.7f, 0.1f, 0.1f);
+
         glPopMatrix();
 
-        // Astronaut
+        // Astronaut (Polished & Shaded, smaller)
         glPushMatrix();
-        glTranslatef(0, astroYOffset, 0);
+        glTranslatef(-30, astroYOffset, 0); // Moved to left
         glRotatef(astroRotation, 0, 0, 1);
-        drawRect(-12, -25, 24, 30, 0.7f, 0.7f, 0.7f);
-        drawRect(-10, -30, 20, 35, 0.9f, 0.9f, 0.9f);
+        glScalef(0.6f, 0.6f, 1.0f); // Reduce size to 0.6
+
+        // Oxygen Backpack
+        drawRect(-14, -25, 28, 32, 0.6f, 0.6f, 0.65f);
+        drawRect(-12, -22, 24, 26, 0.75f, 0.75f, 0.8f);
+        drawRect(-6, -18, 12, 10, 0.4f, 0.4f, 0.45f); // vent
+
+        // Main Suit Torso
+        drawRect(-10, -30, 20, 38, 0.85f, 0.85f, 0.88f);
+        drawRect(-7, -28, 14, 34, 0.95f, 0.95f, 0.95f); // Highlight
+
+        // Chest Control Panel
+        drawRect(-6, -8, 12, 12, 0.7f, 0.7f, 0.75f);
+        drawCircle(-3, -2, 1.5f, 10, 1.0f, 0.2f, 0.2f);
+        drawCircle( 3, -2, 1.5f, 10, 0.2f, 0.8f, 0.2f);
+        drawRect(-4, -6, 8, 3, 0.1f, 0.2f, 0.5f);
+
+        // Legs
         glPushMatrix(); glTranslatef(-10, 0, 0);
-        glRotatef(20 + sinf(sleepTimer * 2) * 10, 0, 0, 1);
-        drawRect(-10, -5, 15, 10, 0.9f, 0.9f, 0.9f); glPopMatrix();
+        glRotatef(20 + sinf(sleepTimer * 2) * 15, 0, 0, 1);
+        drawRect(-10, -5, 15, 12, 0.85f, 0.85f, 0.88f); // thigh
+        drawRect(-8, -3, 11, 8, 0.95f, 0.95f, 0.95f);
+        drawRect(-12, -7, 10, 8, 0.7f, 0.7f, 0.75f); // boot
+        glPopMatrix();
+        
         glPushMatrix(); glTranslatef(10, 0, 0);
-        glRotatef(-20 - sinf(sleepTimer * 2) * 10, 0, 0, 1);
-        drawRect(0, -5, 15, 10, 0.9f, 0.9f, 0.9f); glPopMatrix();
-        glPushMatrix(); glTranslatef(-5, -30, 0);
-        drawRect(-4, -15, 8, 15, 0.9f, 0.9f, 0.9f); glPopMatrix();
-        glPushMatrix(); glTranslatef(5, -30, 0);
-        drawRect(-4, -15, 8, 15, 0.9f, 0.9f, 0.9f); glPopMatrix();
-        drawCircle(0, 15, 12, 30, 1.0f, 1.0f, 1.0f);
-        drawCircle(0, 15,  9, 30, 0.1f, 0.2f, 0.5f);
-        drawCircle(-3, 18, 2, 20, 1.0f, 1.0f, 1.0f);
+        glRotatef(-20 - sinf(sleepTimer * 2) * 15, 0, 0, 1);
+        drawRect(0, -5, 15, 12, 0.85f, 0.85f, 0.88f); // thigh
+        drawRect(2, -3, 11, 8, 0.95f, 0.95f, 0.95f);
+        drawRect(2, -7, 10, 8, 0.7f, 0.7f, 0.75f); // boot
         glPopMatrix();
 
-        //ENTER prompt
-        glColor3f(1.0f, 1.0f, 0.3f);
-        drawText(-55, -90, "Press ENTER to fly to Mars!", GLUT_BITMAP_HELVETICA_18);
+        // Arms
+        glPushMatrix(); glTranslatef(-5, -30, 0);
+        glRotatef(-10 + sinf(sleepTimer * 1.5f) * 10, 0, 0, 1);
+        drawRect(-6, -18, 10, 18, 0.85f, 0.85f, 0.88f); // arm
+        drawRect(-4, -16, 6, 14, 0.95f, 0.95f, 0.95f);
+        drawCircle(-1, -18, 4.0f, 15, 0.4f, 0.4f, 0.45f); // glove
+        glPopMatrix();
+        
+        glPushMatrix(); glTranslatef(5, -30, 0);
+        glRotatef(10 - sinf(sleepTimer * 1.5f) * 10, 0, 0, 1);
+        drawRect(-4, -18, 10, 18, 0.85f, 0.85f, 0.88f); // arm
+        drawRect(-2, -16, 6, 14, 0.95f, 0.95f, 0.95f);
+        drawCircle(1, -18, 4.0f, 15, 0.4f, 0.4f, 0.45f); // glove
+        glPopMatrix();
+
+        // Helmet
+        drawCircle(0, 18, 14, 30, 1.0f, 1.0f, 1.0f); // Helmet shell
+        drawCircle(0, 18, 10, 30, 0.05f, 0.1f, 0.2f); // Visor base
+        
+        // Visor gold reflection
+        glColor3f(0.8f, 0.6f, 0.1f);
+        glBegin(GL_TRIANGLE_FAN);
+            glVertex2f(0, 18);
+            for (int i = 0; i <= 15; i++) {
+                float t = i * 3.14159f / 15;
+                glVertex2f(0 + 10.0f * cosf(t), 18 + 10.0f * sinf(t));
+            }
+        glEnd();
+        // Visor glare
+        drawCircle(-4, 22, 2.5f, 15, 1.0f, 1.0f, 1.0f);
+        drawCircle(-2, 20, 1.0f, 10, 0.9f, 0.9f, 0.9f);
+        
+        // Helmet light
+        drawCircle(-10, 26, 2.0f, 15, 1.0f, 1.0f, 0.5f);
+
+        glPopMatrix();
     }
     else
     {
@@ -1468,10 +1725,25 @@ void display()
             glTranslatef(-12, -65, 0);
         }
 
-        if (lampOn)
-            drawRect(-100, -20, 200, 120, 0.53f, 0.81f, 0.98f);
-        else
-            drawRect(-100, -20, 200, 120, 0.0f, 0.2f, 2.0f);
+        // Smooth cinematic dimming synchronized with sleepiness
+        float dim = smoothStep(sleepTimer / 7.0f);
+        if (!lampOn) dim = 1.0f;
+        float bgR = 0.53f * (1.0f - dim) + 0.08f * dim;
+        float bgG = 0.81f * (1.0f - dim) + 0.12f * dim;
+        float bgB = 0.98f * (1.0f - dim) + 0.25f * dim;
+        
+        // Enhanced wall shading with vertical gradient
+        glBegin(GL_QUADS);
+            glColor3f(bgR * 1.1f, bgG * 1.1f, bgB * 1.1f);
+            glVertex2f(-100, 100); glVertex2f(100, 100);
+            glColor3f(bgR, bgG, bgB);
+            glVertex2f(100, 40);   glVertex2f(-100, 40);
+            
+            glColor3f(bgR, bgG, bgB);
+            glVertex2f(-100, 40);  glVertex2f(100, 40);
+            glColor3f(bgR * 0.5f, bgG * 0.5f, bgB * 0.5f);
+            glVertex2f(100, -20);  glVertex2f(-100, -20);
+        glEnd();
 
         drawRect(-75, 40, 25, 30, 0.3f, 0.2f, 0.1f);
         drawRect(-72, 43, 19, 24, 0.9f, 0.9f, 1.0f);
@@ -1482,7 +1754,13 @@ void display()
         drawCircle(63, 50, 6, 20, 1.0f, 0.4f, 0.0f);
         drawRect(53, 43, 19, 5, 0.4f, 0.2f, 0.1f);
 
-        drawRect(-100, -100, 200, 80, 1.0f, 0.5f, 0.0f);
+        // Floor with depth
+        glBegin(GL_QUADS);
+            glColor3f(0.85f * (1.0f - dim*0.6f), 0.45f * (1.0f - dim*0.6f), 0.1f * (1.0f - dim*0.6f));
+            glVertex2f(-100, -20); glVertex2f(100, -20);
+            glColor3f(0.5f * (1.0f - dim*0.6f), 0.25f * (1.0f - dim*0.6f), 0.05f * (1.0f - dim*0.6f));
+            glVertex2f(100, -100); glVertex2f(-100, -100);
+        glEnd();
 
         drawRect(-1, 80, 2, 20, 0.2f, 0.2f, 0.2f);
         glPushMatrix();
@@ -1492,98 +1770,223 @@ void display()
         drawRect(-25, -2, 20, 4, 0.4f, 0.2f, 0.1f);
         drawRect(5,   -2, 20, 4, 0.4f, 0.2f, 0.1f);
         glPopMatrix();
+        // GIRL BODY (Behind Desk)
+        glPushMatrix();
+        if (isAsleep) glTranslatef(0, -8, 0); // slump down
 
-        drawRect(-5, -60, 4, 35, 0.3f, 0.15f, 0.05f);
-        drawRect(-5, -60, 4, 35, 0.3f, 0.15f, 0.05f);
-        drawRect(-35, -30, 40, 10, 0.4f, 0.2f, 0.1f);
+        // Chair (behind girl)
+        drawRect(-28, -45, 26, 25, 0.35f, 0.18f, 0.08f); // chair back
+        drawRect(-26, -60, 3, 15, 0.2f, 0.1f, 0.02f);    // left leg
+        drawRect( -7, -60, 3, 15, 0.2f, 0.1f, 0.02f);    // right leg
+        
+        // Legs (shorter, start below lap)
+        drawRect(-24, -55, 7, 25, 0.95f, 0.8f, 0.65f);
+        drawRect(-13, -55, 7, 25, 0.95f, 0.8f, 0.65f);
+        // Feet
+        drawRect(-26, -60, 9, 5, 0.4f, 0.1f, 0.1f);
+        drawRect(-14, -60, 9, 5, 0.4f, 0.1f, 0.1f);
 
-        drawRect(-25, -60, 8, 39, 1.0f, 0.8f, 0.6f);
-        drawRect(-13, -60, 8, 39, 1.0f, 0.8f, 0.6f);
-        drawRect(-27, -65, 10, 5, 0.5f, 0.0f, 0.0f);
-        drawRect(-14, -65, 10, 5, 0.5f, 0.0f, 0.0f);
+        // Torso
+        glColor3f(0.85f, 0.35f, 0.35f);
+        glBegin(GL_POLYGON);
+            glVertex2f(-26, -28); glVertex2f(-22, 5);
+            glVertex2f( -8,   5); glVertex2f( -4,-28);
+        glEnd();
+        
+        // Hair Back
+        drawCircle(-15, 20, 12, 30, 0.1f, 0.1f, 0.1f);
+        drawCircle(-22, 12, 10, 30, 0.1f, 0.1f, 0.1f);
+        drawCircle(-8,  12, 10, 30, 0.1f, 0.1f, 0.1f);
+        drawRect(-28, -2, 26, 16, 0.1f, 0.1f, 0.1f);
 
-        drawRect(-65, -80, 8, 60, 0.36f, 0.18f, 0.05f);
-        drawRect(57,  -80, 8, 60, 0.36f, 0.18f, 0.05f);
-        drawRect(-80, -24, 160, 17, 0.54f, 0.27f, 0.07f);
-        drawRect(-80, -24, 160,  4, 0.44f, 0.22f, 0.05f);
+        // Neck
+        drawCircle(-15, 5, 3.5f, 20, 1.0f, 0.8f, 0.6f);
+        
+        // Head
+        drawCircle(-15, 16, 10.0f, 30, 1.0f, 0.8f, 0.6f);
 
-        if (lampOn) {
-            drawCircle(-50, 18, 3, 20, 1.0f, 1.0f, 0.8f);
-            glBegin(GL_TRIANGLES);
-                glColor3f(1.0f, 1.0f, 0.7f); glVertex2f(-50, 15);
-                glColor3f(1.0f, 1.0f, 0.4f);
-                glVertex2f(-85, -7); glVertex2f(-15, -7);
+        // Facial details
+        if (isAsleep) {
+            glColor3f(0.0f, 0.0f, 0.0f);
+            glLineWidth(2.0f);
+            glBegin(GL_LINE_STRIP);
+                glVertex2f(-19.5f,15.5f); glVertex2f(-18.0f,14.5f); glVertex2f(-16.5f,15.5f);
             glEnd();
+            glBegin(GL_LINE_STRIP);
+                glVertex2f(-13.5f,15.5f); glVertex2f(-12.0f,14.5f); glVertex2f(-10.5f,15.5f);
+            glEnd();
+            drawCircle(-15, 11, 1.5f, 10, 0.0f, 0.0f, 0.0f);
+            glBegin(GL_LINES);
+                glVertex2f(-20,18); glVertex2f(-16,19);
+                glVertex2f(-14,19); glVertex2f(-10,18);
+            glEnd();
+        } else {
+            float sleepiness = smoothStep(sleepTimer / 7.0f);
+            drawCircle(-18,17, 2.0f,15,1.0f,1.0f,1.0f);
+            drawCircle(-12,17, 2.0f,15,1.0f,1.0f,1.0f);
+            float eyeDrop = sleepiness * 1.5f;
+            drawCircle(-18,16.5f - eyeDrop*0.5f, 1.0f,10,0.1f,0.1f,0.2f);
+            drawCircle(-12,16.5f - eyeDrop*0.5f, 1.0f,10,0.1f,0.1f,0.2f);
+            
+            if (sleepiness > 0.05f) {
+                glColor3f(0.9f, 0.7f, 0.5f); 
+                glBegin(GL_QUADS);
+                    glVertex2f(-20.5f, 19); glVertex2f(-15.5f, 19);
+                    glVertex2f(-15.5f, 19 - sleepiness * 2.8f); glVertex2f(-20.5f, 19 - sleepiness * 2.8f);
+                    glVertex2f(-14.5f, 19); glVertex2f(-9.5f, 19);
+                    glVertex2f(-9.5f, 19 - sleepiness * 2.8f); glVertex2f(-14.5f, 19 - sleepiness * 2.8f);
+                glEnd();
+                glColor3f(0.2f, 0.1f, 0.1f);
+                glLineWidth(1.5f);
+                glBegin(GL_LINES);
+                    glVertex2f(-20.5f, 19 - sleepiness * 2.8f); glVertex2f(-15.5f, 19 - sleepiness * 2.8f);
+                    glVertex2f(-14.5f, 19 - sleepiness * 2.8f); glVertex2f(-9.5f, 19 - sleepiness * 2.8f);
+                glEnd();
+            }
+
+            glColor3f(0.2f,0.1f,0.1f);
+            glLineWidth(2.5f);
+            glBegin(GL_LINES);
+                glVertex2f(-20, 20.5f - sleepiness); glVertex2f(-16, 21.5f - sleepiness*1.5f);
+                glVertex2f(-14, 21.5f - sleepiness*1.5f); glVertex2f(-10, 20.5f - sleepiness);
+            glEnd();
+
+            glColor3f(0.8f,0.2f,0.2f);
+            glLineWidth(2.0f);
+            if (sleepiness > 0.6f) {
+                drawCircle(-15, 11.5f, 0.8f + sleepiness*0.6f, 10, 0.1f, 0.0f, 0.0f);
+            } else {
+                glBegin(GL_LINE_STRIP);
+                    glVertex2f(-17,11.5f); glVertex2f(-15,11.0f); glVertex2f(-13,11.5f);
+                glEnd();
+            }
         }
-        drawRect(-60, -7, 20, 4, 0.2f, 0.2f, 0.2f);
-        if (lampOn) drawCircle(-50, -5, 1.5f, 20, 1.0f, 1.0f, 0.0f);
-        else        drawCircle(-50, -5, 1.5f, 20, 0.4f, 0.4f, 0.4f);
+        glPopMatrix();
+
+        // DESK (In Front of Girl Body)
+        drawRect(-40, -60, 4, 30, 0.3f, 0.15f, 0.05f); // Left leg
+        drawRect( 25, -60, 4, 30, 0.3f, 0.15f, 0.05f); // Right leg
+        drawRect(-45, -30, 75, 10, 0.45f, 0.25f, 0.15f); // Desk top (X: -45 to 30)
+        drawRect(-45, -35, 75,  5, 0.3f, 0.15f, 0.05f);  // Desk rim
+
+        // GIRL ARMS (Over Desk)
+        glPushMatrix();
+        if (isAsleep) glTranslatef(0, -8, 0); // slump down
+        if (isAsleep) {
+            glPushMatrix(); glTranslatef(-22, -10, 0); glRotatef(15, 0, 0, 1);
+            drawRect(-3, -15, 6, 20, 0.75f, 0.25f, 0.25f);
+            drawCircle(0, -15, 3, 10, 1.0f, 0.8f, 0.6f); glPopMatrix();
+            
+            glPushMatrix(); glTranslatef(-8, -10, 0); glRotatef(-15, 0, 0, 1);
+            drawRect(-3, -15, 6, 20, 0.75f, 0.25f, 0.25f);
+            drawCircle(0, -15, 3, 10, 1.0f, 0.8f, 0.6f); glPopMatrix();
+        } else {
+            glPushMatrix(); glTranslatef(-25, 0, 0); glRotatef(30, 0, 0, 1);
+            drawRect(-3, -20, 6, 22, 0.75f, 0.25f, 0.25f);
+            drawCircle(0, -20, 3, 10, 1.0f, 0.8f, 0.6f); glPopMatrix();
+            
+            glPushMatrix(); glTranslatef(-5, 0, 0); glRotatef(-30, 0, 0, 1);
+            drawRect(-3, -20, 6, 22, 0.75f, 0.25f, 0.25f);
+            drawCircle(0, -20, 3, 10, 1.0f, 0.8f, 0.6f); glPopMatrix();
+        }
+        glPopMatrix();
+
+        // OBJECTS ON DESK
+        // Animated Table Lamp
+        float lampPulse = lampOn ? (sinf(sleepTimer * 8.0f) * 0.1f + 0.9f) : 0.0f;
+        glPushMatrix();
+        glTranslatef(20, -13, 0); // Move lamp onto the right side of the desk
+
+        // Lamp Base
+        drawRect(-60, -7, 20, 4, 0.15f, 0.15f, 0.15f);
+        drawRect(-51, -3, 2, 18, 0.25f, 0.25f, 0.25f);
+        
+        // Lamp Shade
         glColor3f(0.8f, 0.1f, 0.1f);
         glBegin(GL_QUADS);
             glVertex2f(-65, 15); glVertex2f(-35, 15);
             glVertex2f(-42, 28); glVertex2f(-58, 28);
         glEnd();
-        drawRect(-51, -3, 2, 18, 0.3f, 0.3f, 0.3f);
-
-        glPushMatrix();
-        if (isAsleep) glTranslatef(0, -6, 0);
-
-        drawCircle(-15, 22, 11, 30, 0.1f, 0.1f, 0.1f);
-        drawCircle(-20, 15, 9,  30, 0.1f, 0.1f, 0.1f);
-        drawCircle(-10, 15, 9,  30, 0.1f, 0.1f, 0.1f);
-        drawRect(-27.5f, 1, 25, 17, 0.1f, 0.1f, 0.1f);
-
-        glColor3f(0.8f, 0.3f, 0.3f);
-        glBegin(GL_POLYGON);
-            glVertex2f(-35, -10); glVertex2f(-25, 5);
-            glVertex2f( -5,   5); glVertex2f(  7,-10);
-        glEnd();
-        drawRect(-35.0f, -12.0f, 41.0f, 5.0f, 1.0f, 0.8f, 0.6f);
-        drawCircle(-15, 4,  4, 20, 1.0f, 0.8f, 0.6f);
-        drawCircle(-15, 15,10, 30, 1.0f, 0.8f, 0.6f);
-        drawCircle(-15,-10, 5, 10, 1.0f, 0.8f, 0.6f);
-
-        if (isAsleep) {
-            glColor3f(0.0f, 0.0f, 0.0f);
-            glLineWidth(2.0f);
-            glBegin(GL_LINES);
-                glVertex2f(-19.5f,16.5f); glVertex2f(-16.5f,16.5f);
-                glVertex2f(-13.5f,16.5f); glVertex2f(-10.5f,16.5f);
+        
+        // Lamp Bulb and Glow
+        if (lampOn) {
+            drawCircle(-50, 18, 3, 20, 1.0f, 1.0f, 0.8f * lampPulse);
+            drawCircle(-50, -5, 1.5f, 20, 1.0f, 1.0f, 0.0f); // base button ON
+            
+            // Soft Light Cone
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glBegin(GL_TRIANGLES);
+                glColor4f(1.0f, 0.9f, 0.4f, 0.6f * lampPulse); glVertex2f(-50, 15);
+                glColor4f(1.0f, 0.8f, 0.2f, 0.0f); glVertex2f(-85, -15); 
+                glColor4f(1.0f, 0.8f, 0.2f, 0.0f); glVertex2f(-15, -15);
             glEnd();
-            drawCircle(-15, 10, 1, 10, 0.0f, 0.0f, 0.0f);
-            glBegin(GL_LINES);
-                glVertex2f(-20,19); glVertex2f(-17,19);
-                glVertex2f(-13,19); glVertex2f(-10,19);
-            glEnd();
+            glDisable(GL_BLEND);
         } else {
-            drawCircle(-18,17, 1.5f,10,1.0f,1.0f,1.0f);
-            drawCircle(-12,17, 1.5f,10,1.0f,1.0f,1.0f);
-            drawCircle(-18,16.5f,0.8f,10,0.0f,0.0f,0.0f);
-            drawCircle(-12,16.5f,0.8f,10,0.0f,0.0f,0.0f);
-            glColor3f(0.8f,0.2f,0.2f);
-            glLineWidth(2.0f);
-            glBegin(GL_LINES);
-                glVertex2f(-18,11); glVertex2f(-15,12);
-                glVertex2f(-15,12); glVertex2f(-12,11);
-                glColor3f(0.0f,0.0f,0.0f);
-                glVertex2f(-21,20); glVertex2f(-17,22);
-                glVertex2f(-14,22); glVertex2f(-10,20);
-            glEnd();
+            drawCircle(-50, -5, 1.5f, 20, 0.4f, 0.4f, 0.4f); // base button OFF
         }
         glPopMatrix();
 
+        // Laptop
+        glPushMatrix();
+        glTranslatef(-2, -20, 0);
+        drawRect(-6, 0, 12, 8, 0.8f, 0.8f, 0.85f);
+        drawRect(-5, 1, 10, 6, 0.1f, 0.1f, 0.15f);
+        drawRect(-8, -2, 16, 2, 0.7f, 0.7f, 0.75f);
+        if (lampOn) {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glBegin(GL_QUADS);
+                glColor4f(0.5f, 0.8f, 1.0f, 0.2f); glVertex2f(-5, 1);
+                glColor4f(0.5f, 0.8f, 1.0f, 0.2f); glVertex2f(5, 1);
+                glColor4f(0.5f, 0.8f, 1.0f, 0.0f); glVertex2f(10, -10);
+                glColor4f(0.5f, 0.8f, 1.0f, 0.0f); glVertex2f(-10, -10);
+            glEnd();
+            glDisable(GL_BLEND);
+        }
+        glPopMatrix();
+
+        // Books on Table
+        glPushMatrix();
+        glTranslatef(10, -20, 0);
+        drawRect(0, 0, 10, 3, 0.2f, 0.4f, 0.8f);
+        drawRect(0, 3, 9, 3, 0.8f, 0.3f, 0.2f);
+        drawRect(-1, 6, 10, 3, 0.1f, 0.6f, 0.3f);
+        glPushMatrix();
+        glTranslatef(-1, 9, 0);
+        glRotatef(12, 0, 0, 1);
+        drawRect(0, 0, 10, 2.5f, 0.8f, 0.7f, 0.1f);
+        glPopMatrix();
+        glPopMatrix();
+
+        // Moderate two-layer cabinet beside the window.
+        drawRect(44, -20, 36, 56, 0.45f, 0.23f, 0.08f);
+        drawRect(47, 8, 30, 25, 0.58f, 0.32f, 0.12f);
+        drawRect(47, -17, 30, 25, 0.58f, 0.32f, 0.12f);
+        drawRect(60, 9, 2, 23, 0.35f, 0.17f, 0.06f);
+        drawRect(60, -16, 2, 23, 0.35f, 0.17f, 0.06f);
+        drawCircle(57, 20, 1.5f, 12, 0.95f, 0.78f, 0.25f);
+        drawCircle(67, 20, 1.5f, 12, 0.95f, 0.78f, 0.25f);
+        drawCircle(57, -5, 1.5f, 12, 0.95f, 0.78f, 0.25f);
+        drawCircle(67, -5, 1.5f, 12, 0.95f, 0.78f, 0.25f);
+
+        // Plant on top of cabinet
         glColor3f(0.6f, 0.3f, 0.2f);
         glBegin(GL_QUADS);
-            glVertex2f(50,8); glVertex2f(70,8);
-            glVertex2f(66,-8); glVertex2f(54,-8);
+            glVertex2f(50, 52); glVertex2f(70, 52);
+            glVertex2f(66, 36); glVertex2f(54, 36);
         glEnd();
-        drawRect(59, 8, 2, 15, 0.13f, 0.35f, 0.13f);
-        drawCircle(60, 23, 10, 20, 0.13f, 0.55f, 0.13f);
-        drawCircle(52, 18,  7, 20, 0.13f, 0.45f, 0.13f);
-        drawCircle(68, 18,  7, 20, 0.13f, 0.45f, 0.13f);
+        drawRect(59, 52, 2, 15, 0.13f, 0.35f, 0.13f);
+        drawCircle(60, 67, 10, 20, 0.13f, 0.55f, 0.13f);
+        drawCircle(52, 62,  7, 20, 0.13f, 0.45f, 0.13f);
+        drawCircle(68, 62,  7, 20, 0.13f, 0.45f, 0.13f);
 
+        // Clock on Table
+        glPushMatrix();
+        glTranslatef(-3, -12, 0);
         drawCircle(25, 0, 8, 30, 0.8f, 0.0f, 0.0f);
         drawCircle(25, 0, 7, 30, 1.0f, 1.0f, 1.0f);
+        
         glPushMatrix();
         glTranslatef(25, 0, 0);
         glColor3f(0.8f, 0.0f, 0.0f);
@@ -1597,16 +2000,12 @@ void display()
         glBegin(GL_LINES); glVertex2f(0,0); glVertex2f(4,0); glEnd();
         glPopMatrix();
         glPopMatrix();
+        
+        // Clock legs
         glBegin(GL_TRIANGLES);
             glVertex2f(25,0); glVertex2f(20,-8); glVertex2f(30,-8);
         glEnd();
-
-        drawRect(-75, -7, 22, 3, 0.2f, 0.3f, 0.7f);
-        drawRect(-74, -4, 22, 3, 0.3f, 0.6f, 0.3f);
-        drawRect(-76, -1, 22, 3, 0.8f, 0.4f, 0.2f);
-        drawRect(-75,  2, 22, 3, 0.8f, 0.7f, 0.2f);
-        drawRect(-76,-10, 22, 3, 0.2f, 0.1f, 0.7f);
-        drawRect(-75,-13, 22, 3, 0.2f, 0.3f, 0.1f);
+        glPopMatrix();
 
         drawCircle(mouseX,    -88, 3,   20, 0.6f, 0.3f, 0.1f);
         drawCircle(mouseX+3,  -88, 1.8f,20, 0.6f, 0.3f, 0.1f);
@@ -1616,17 +2015,31 @@ void display()
             glVertex2f(mouseX-3,-88); glVertex2f(mouseX-8,-86);
         glEnd();
 
+        // Animated Dream Cloud
         if (isDreaming) {
-            if (sleepTimer > 8.0f)  drawCircle(-5, 25, 1.5f,20,1.0f,1.0f,1.0f);
-            if (sleepTimer > 8.5f)  drawCircle( 0, 30, 2.5f,20,1.0f,1.0f,1.0f);
-            if (sleepTimer > 9.0f)  drawCircle( 5, 35, 3.0f,20,1.0f,1.0f,1.0f);
-            if (sleepTimer > 9.0f)  drawCircle( 5, 45, 5.0f,20,1.0f,1.0f,1.0f);
+            float floatY = sinf(sleepTimer * 3.0f) * 2.0f;
+            float pulse = (sinf(sleepTimer * 4.0f) + 1.0f) * 0.2f;
+            
+            glPushMatrix();
+            glTranslatef(0, floatY, 0);
+            
+            // Trail bubbles
+            if (sleepTimer > 8.0f)  drawCircle(-5, 25, 1.5f, 20, 0.9f+pulse, 0.9f+pulse, 1.0f);
+            if (sleepTimer > 8.5f)  drawCircle( 0, 30, 2.5f, 20, 0.9f+pulse, 0.9f+pulse, 1.0f);
+            if (sleepTimer > 9.0f)  drawCircle( 5, 38, 3.5f, 20, 0.9f+pulse, 0.9f+pulse, 1.0f);
+            
+            // Main Dream Cloud
             if (sleepTimer > 9.5f) {
-                drawCircle(12,65,10,30,1.0f,1.0f,1.0f);
-                drawCircle(20,67, 9,30,1.0f,1.0f,1.0f);
-                drawCircle( 5,67, 9,30,1.0f,1.0f,1.0f);
-                drawCircle(12,72, 8,30,1.0f,1.0f,1.0f);
+                drawCircle(12, 65, 12, 30, 0.9f+pulse, 0.9f+pulse, 1.0f);
+                drawCircle(22, 68, 10, 30, 0.9f+pulse, 0.9f+pulse, 1.0f);
+                drawCircle( 2, 68, 10, 30, 0.9f+pulse, 0.9f+pulse, 1.0f);
+                drawCircle(12, 74,  9, 30, 0.9f+pulse, 0.9f+pulse, 1.0f);
+                
+                // Animated Dream Text
+                glColor3f(0.2f, 0.4f, 0.8f);
+                drawText(-2, 65, "Dreaming...", GLUT_BITMAP_HELVETICA_18);
             }
+            glPopMatrix();
         }
     }
 
@@ -1639,14 +2052,19 @@ void timerFunc(int)
     glutPostRedisplay();
     glutTimerFunc(1000/60, timerFunc, 0);
 
+    // Continuous updates for room objects
+    fanAngle += 15.0f;
+    if (fanAngle > 360) fanAngle -= 360;
+    clockAngle += 0.05f;
+    if (clockAngle > 360) clockAngle -= 360;
+    mouseX += 1.5f;
+    if (mouseX > 120) mouseX = -120;
+
     if (isWakeUpScene)
     {
         //wake up, show dialogue, then turn the head.
         const float dt = FrameTime;
         wakeTimer += dt;
-        fanAngle   += 15.0f;
-        clockAngle += 0.05f;
-        mouseX     += 1.5f;
 
         if (wakeTimer > WakeHeadLiftStart)
             wakeHeadLift += 6.0f * dt;
@@ -1714,7 +2132,7 @@ void timerFunc(int)
             marsRocketLandY = 90.0f;
             girlWalkX       = 8.0f;
             alienAppear     = 0.0f;
-            escapeRocketY   = -50.0f;
+            escapeRocketY   = -45.0f;
             warningAlpha    = 0.0f;
         }
         return;
@@ -1731,9 +2149,9 @@ void timerFunc(int)
         if (marsPhase == 0)
         {
             marsRocketLandY -= 55.0f * dt;
-            if (marsRocketLandY <= -24.0f)
+            if (marsRocketLandY <= -45.0f)
             {
-                marsRocketLandY = -24.0f;
+                marsRocketLandY = -45.0f;
                 marsPhase = 1;
                 marsPhaseTimer = 0.0f;
                 girlWalkX = 8.0f;
@@ -1778,7 +2196,7 @@ void timerFunc(int)
         {
             marsPhase = 5;
             marsPhaseTimer = 0.0f;
-            escapeRocketY = -50.0f;
+            escapeRocketY = -45.0f;
         }
 
 
@@ -1842,8 +2260,16 @@ void timerFunc(int)
         mercuryAngle += 2.0f;
         venusAngle   += 1.2f;
         earthAngle   += 0.7f;
-        rocketY      += 0.8f;
-        if (rocketY > 120.0f) rocketY = -120.0f;
+        rocketY      += 0.9f; // Slightly faster rocket
+        
+        if (rocketY > 150.0f && !isTravelScene && !isMarsScene)
+        {
+            isTravelScene      = true;
+            travelTimer        = 0.0f;
+            marsApproachSize   = 5.0f;   // Mars starts tiny
+            rocketTravelX      = 0.0f;   // rocket centred
+            rocketTravelY      = -75.0f; // near bottom of screen
+        }
     }
 }
 
